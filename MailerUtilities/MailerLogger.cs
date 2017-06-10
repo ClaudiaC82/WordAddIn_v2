@@ -7,7 +7,7 @@ using System.Text;
 
 namespace MailerUtilities
 {
-    class MailerLogger
+    public static class MailerLogger
     {
         static SqlConnection con;
         private static void connection(string connection_string)
@@ -26,9 +26,16 @@ namespace MailerUtilities
         //    com.ExecuteNonQuery();
         //    con.Close();
         //}
-        public void SendLogToDB(int type, string message, string connection_string) /*type=1 : ERROR; type=2 : DEBUG*/
+        public static void SendLogToDB(int type, string message) 
+        /*
+         * type=1 : ERROR; 
+         * type=2 : DEBUG
+         */
         {
-            connection(connection_string);
+            //ConfigReader.Configuration configurazione = ConfigReader.PersistableObject.Load<ConfigReader.Configuration>(@"config.xml");
+            ConfigReader.Configuration configurazione = new ConfigReader.Configuration();
+            configurazione.connection_string = "Data Source=.\\SQLEXPRESS;Initial Catalog=wordAddIn;User id=consap1 ; Password=consap ;";
+            connection(configurazione.connection_string);
             SqlCommand com = new SqlCommand("sp_Log", con);
             com.CommandType = CommandType.StoredProcedure;
             com.Parameters.AddWithValue("@LogMsg", message);

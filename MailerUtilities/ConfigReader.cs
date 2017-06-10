@@ -23,14 +23,21 @@ namespace MailerUtilities
         {
             public static T Load<T>(string fileName) where T : PersistableObject, new()
             {
-                T result = default(T);
-
-                using (FileStream stream = File.OpenRead(fileName))
+                try
                 {
-                    result = new XmlSerializer(typeof(T)).Deserialize(stream) as T;
-                }
+                    T result = default(T);
 
-                return result;
+                    using (FileStream stream = File.OpenRead(fileName))
+                    {
+                        result = new XmlSerializer(typeof(T)).Deserialize(stream) as T;
+                    }
+
+                    return result;
+                }
+                catch (Exception ex) {
+                    MailerLogger.SendLogToDB(1, "Errore Durante Lettura Parametri di configurazione: "+ex.Message);
+                    return null;
+                }
             }
         }
     }
