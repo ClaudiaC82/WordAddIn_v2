@@ -81,7 +81,6 @@
             // pnlControlloEmail
             // 
             this.pnlControlloEmail.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.pnlControlloEmail.Controls.Add(this.pnlRiepilogo);
             this.pnlControlloEmail.Controls.Add(this.label5);
             this.pnlControlloEmail.Controls.Add(this.cbSiNo);
             this.pnlControlloEmail.Controls.Add(this.label4);
@@ -105,9 +104,9 @@
             this.pnlRiepilogo.Controls.Add(this.lblInviate);
             this.pnlRiepilogo.Controls.Add(this.lblTotale);
             this.pnlRiepilogo.Controls.Add(this.label6);
-            this.pnlRiepilogo.Location = new System.Drawing.Point(0, 0);
+            this.pnlRiepilogo.Location = new System.Drawing.Point(-1, 75);
             this.pnlRiepilogo.Name = "pnlRiepilogo";
-            this.pnlRiepilogo.Size = new System.Drawing.Size(461, 348);
+            this.pnlRiepilogo.Size = new System.Drawing.Size(461, 351);
             this.pnlRiepilogo.TabIndex = 1;
             this.pnlRiepilogo.Visible = false;
             // 
@@ -265,9 +264,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(462, 438);
+            this.ClientSize = new System.Drawing.Size(461, 438);
             this.Controls.Add(this.pnlControlloEmail);
             this.Controls.Add(this.pnlCaricamento);
+            this.Controls.Add(this.pnlRiepilogo);
             this.Controls.Add(this.button1);
             this.Name = "ConfigurazioneMessaggio";
             this.Text = "Configurazione Messaggio";

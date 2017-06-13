@@ -50,7 +50,7 @@ namespace WordAddIn2
                 XLSX xlsx = new XLSX();
                 pnlControlloEmail.Hide();
                 pnlRiepilogo.Hide();
-                pnlCaricamento.TabIndex = 1;
+                pnlCaricamento.BringToFront();
                 pnlCaricamento.Show();
                 listaMessaggi = xlsx.elaboraExcel(Path.GetFullPath(openFileDialog.FileName),messaggio);
             }
@@ -75,7 +75,7 @@ namespace WordAddIn2
             lblCheckMail.Text = "Caricate " + listaMessaggi.Count + " righe";
             pnlCaricamento.Hide();
             pnlRiepilogo.Hide();
-            pnlControlloEmail.TabIndex = 1;
+            pnlControlloEmail.BringToFront();
             pnlControlloEmail.Show();
         }
 
@@ -122,7 +122,7 @@ namespace WordAddIn2
             }
             pnlCaricamento.Hide();
             pnlControlloEmail.Hide();
-            pnlCaricamento.TabIndex = 1;
+            pnlRiepilogo.BringToFront();
             pnlRiepilogo.Show();
         }
     
