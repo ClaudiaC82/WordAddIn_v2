@@ -17,9 +17,14 @@ namespace WordAddIn2
     {
         List<messaggio> listaMessaggi;
         string messaggio = "";
+        string[] sino = { "SI", "NO" };
         public ConfigurazioneMessaggio()
         {
             InitializeComponent();
+            foreach (string s in sino) {
+                cbSiNo.Items.Add(s);
+            }
+            cbSiNo.SelectedIndex = 0;
         }
 
         private void ConfigurazioneMessaggio_Load(object sender, EventArgs e)
@@ -43,6 +48,10 @@ namespace WordAddIn2
             if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 XLSX xlsx = new XLSX();
+                pnlControlloEmail.Hide();
+                pnlRiepilogo.Hide();
+                pnlCaricamento.TabIndex = 1;
+                pnlCaricamento.Show();
                 listaMessaggi = xlsx.elaboraExcel(Path.GetFullPath(openFileDialog.FileName),messaggio);
             }
             Microsoft.Office.Interop.Outlook.Application olkApp1 = new Outlook.Application();
@@ -54,20 +63,68 @@ namespace WordAddIn2
                 cbIndirizzi.Items.Add(account.SmtpAddress.ToString());
             }
             cbIndirizzi.SelectedIndex = 0;
+            List<messaggiErrati> listaMessaggiErrati = (from item in listaMessaggi where item.errore
+                                                        select (new messaggiErrati() {
+                                                            MessaggioTest = item.MessaggioTest ? "SI" : "NO",
+                                                            Destinatario = item.Destinatario,
+                                                            Allegati = String.Concat(item.Allegati)
+                                                        })
+                                                        ).ToList();
+
+            dataGridView1.DataSource = listaMessaggiErrati;
             lblCheckMail.Text = "Caricate " + listaMessaggi.Count + " righe";
+            pnlCaricamento.Hide();
+            pnlRiepilogo.Hide();
+            pnlControlloEmail.TabIndex = 1;
             pnlControlloEmail.Show();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            listaMessaggi.ForEach(delegate (messaggio m) {
-                Invio.invioEmail(cbIndirizzi.Text, m);
-            });
+            List<messaggio> daInviare = (from item in listaMessaggi
+                                         where
+             (item.MessaggioTest && cbSiNo.Text == "SI")
+             ||
+             (!item.MessaggioTest && cbSiNo.Text == "NO")
+                                         select item).ToList();
+            int inviati = 0;
+            int nonInviati = 0;
+            List<messaggiErrati> mexNonInviati = new List<messaggiErrati>();
+             daInviare.ForEach(delegate (messaggio m)
+             {
+                 if (Invio.invioEmail(cbIndirizzi.Text, m))
+                 {
+                     inviati = inviati + 1;
+                 }
+                 else {
+                     nonInviati = nonInviati + 1;
+                     messaggiErrati me = new messaggiErrati();
+                     me.MessaggioTest = m.MessaggioTest ? "SI" : "NO";
+                     me.Destinatario = m.Destinatario;
+                     me.Allegati = String.Concat(m.Allegati);
+                     mexNonInviati.Add(me);
+                 }
+             });
+             caricaPannelloRiepilogativo(inviati, nonInviati, mexNonInviati);
         }
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            MailerLogger.SendLogToDB(1, "prova scrittura messaggio");
+        private void caricaPannelloRiepilogativo(int inviati, int nonInviati, List<messaggiErrati> mexNonInviati) {
+            lblTotale.Text = "Totale messaggi: " + (inviati + nonInviati).ToString();
+            lblErrate.Text = "Messaggi non inviati: " + nonInviati.ToString();
+            lblInviate.Text = "Messaggi inviati: " + inviati.ToString();
+            if (nonInviati > 0)
+            {
+                gvErrori.DataSource = mexNonInviati;
+                gvErrori.Show();
+            }
+            else {
+                gvErrori.Hide();
+            }
+            pnlCaricamento.Hide();
+            pnlControlloEmail.Hide();
+            pnlCaricamento.TabIndex = 1;
+            pnlRiepilogo.Show();
         }
+    
     }
 }

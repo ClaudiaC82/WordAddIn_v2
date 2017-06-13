@@ -4,10 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Excel;
+using System.IO;
 
 namespace MailerUtilities
 {
+    public class messaggiErrati {
+        public string MessaggioTest { get; set; }
+        public string Destinatario { get; set; }
+        public string Allegati { get; set; }
+    }
     public class messaggio {
+        public bool errore { get; set; }
         public bool MessaggioTest { get; set; }
         public string Destinatario { get; set; }
         public string Copia { get; set; }
@@ -46,12 +53,32 @@ namespace MailerUtilities
                 for (rCnt = 2; rCnt <= righe; rCnt++)
                 {
                     messaggio mex = new messaggio();
+                    mex.errore = false;
                     mex.MessaggioTest = ((string)(range.Cells[rCnt, 1] as Range).Value2).ToLower().Trim().Equals("si");
                     mex.Destinatario = (string)(range.Cells[rCnt, 2] as Range).Value2;
+                    if (string.IsNullOrEmpty(mex.Destinatario))
+                        mex.errore = true;
                     mex.Copia = (string)(range.Cells[rCnt, 3] as Range).Value2;
                     mex.CopiaNascosta = (string)(range.Cells[rCnt, 4] as Range).Value2;
                     mex.Oggetto = (string)(range.Cells[rCnt, 6] as Range).Value2;
-                    mex.Allegati = (range.Cells[rCnt, 5] as Range).Value2 != null ? ((string)(range.Cells[rCnt, 5] as Range).Value2).Split(';').ToList() : new List<string>();
+                    if (string.IsNullOrEmpty(mex.Oggetto))
+                        mex.errore = true;
+                    if ((range.Cells[rCnt, 5] as Range).Value2 != null)
+                    {
+                        List<string> listaAllegati = ((string)(range.Cells[rCnt, 5] as Range).Value2).Split(';').ToList();
+                        listaAllegati.ForEach(delegate (string allegato)
+                        {
+                            if (!File.Exists(allegato))
+                                mex.errore = true;
+                        });
+                        mex.Allegati = listaAllegati;
+                    }
+                    else {
+                        mex.Allegati = null;
+                    }
+
+
+
                     mex.Messaggio = messaggioWord;
 
                     for (cCnt = 7; cCnt <= colonne; cCnt++)
