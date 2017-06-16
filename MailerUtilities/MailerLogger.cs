@@ -33,8 +33,10 @@ namespace MailerUtilities
          */
         {
             //ConfigReader.Configuration configurazione = ConfigReader.PersistableObject.Load<ConfigReader.Configuration>(@"config.xml");
+            string base_directory = AppDomain.CurrentDomain.BaseDirectory;
             ConfigReader.Configuration configurazione = new ConfigReader.Configuration();
-            configurazione.connection_string = "Data Source=.\\SQLEXPRESS;Initial Catalog=wordAddIn;User id=consap1 ; Password=consap ;";
+            configurazione.connection_string = ConfigReader.PersistableObject.Load<ConfigReader.Configuration>(String.Format("{0}\\config.xml", base_directory)).connection_string;
+            //"Data Source=.\\SQLEXPRESS;Initial Catalog=wordAddIn;User id=consap1 ; Password=consap ;";
             connection(configurazione.connection_string);
             SqlCommand com = new SqlCommand("sp_Log", con);
             com.CommandType = CommandType.StoredProcedure;
